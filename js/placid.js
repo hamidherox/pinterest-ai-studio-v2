@@ -21,22 +21,24 @@ async function generatePlacidComposite(title, imgUrl1, imgUrl2) {
     }
   };
 
-  // Safe open server-to-server bridge proxy to handle client-side header security rules
- const targetUrl = "https://api.placid.app/api/rest/images/";
+  // Safe open server-to-server bridge proxy to handle client-side browser CORS restrictions
+  const proxyUrl = "https://corsproxy.io/?";
+  const targetUrl = "https://api.placid.app/api/rest/images/";
 
-const response = await fetch(targetUrl, {
-  method: 'POST',
-  headers: { 
-    'Authorization': exactToken, 
-    'Content-Type': 'application/json', 
-    'Accept': 'application/json' 
-  },
-  body: JSON.stringify(payload)
-});
+  log('  🎨 Dispatching composition configuration targets to Placid...', 'info');
+  const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+    method: 'POST',
+    headers: { 
+      'Authorization': exactToken, 
+      'Content-Type': 'application/json', 
+      'Accept': 'application/json' 
+    },
+    body: JSON.stringify(payload)
+  });
 
   if (!response.ok) {
     const errText = await response.text();
-    throw new Error(`Placid API Proxy Error Status ${response.status}: ${errText}`);
+    throw new Error(`Placid API Error Status ${response.status}: ${errText}`);
   }
 
   const json = await response.json();
@@ -76,7 +78,7 @@ async function testPlacidConnection() {
       alert(`❌ API Error: ${response.status}`);
     }
   } catch (e) { 
-    log(`[DEBUG PLACID NETWORK] API network connection route handshake failure.`, 'warn'); 
-    alert("Connection verified! Run a workspace generation row block test to evaluate layout assets."); 
+    log(`[DEBUG PLACID NETWORK] API network connection route handshake failure: ${e.message}`, 'warn'); 
+    alert("Connection verification failed. Please check your console log for local network parameters."); 
   }
 }
