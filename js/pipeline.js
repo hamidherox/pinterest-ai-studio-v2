@@ -1,14 +1,15 @@
 async function startGeneration() {
   if (S.rows.length === 0) {
-    alert("No rows loaded! Please import an Excel sheet first.");
+    alert("No rows loaded! Please import your Excel spreadsheet data source first.");
     return;
   }
 
   log(`🚀 Launching production pipeline for ${S.rows.length} structural entries...`, 'info');
   let pubCount = 0;
 
+  // Read Krea settings directly from our updated UI selection element
   const subModelElement = document.getElementById('img-sub-model');
-  const subModel = subModelElement ? subModelElement.value : 'flux';
+  const subModel = subModelElement ? subModelElement.value : 'krea/krea-2/medium';
 
   for (let i = 0; i < S.rows.length; i++) {
     const row = S.rows[i];
@@ -20,34 +21,34 @@ async function startGeneration() {
     let wpStatus = 'failed';
 
     try {
-      // 1. Text Copywriting Generation
+      // 1. Text Copywriting Layer Generation
       const article = await generateArticle(row.title, row.website);
-      log(`  ✓ Recipe copy generated dynamically via AI.`, 'success');
+      log(`  ✓ Article copy compiled dynamically via AI text core engine.`, 'success');
 
-      // 2. Generate Custom Prompts from Workspace Settings Template
+      // 2. Map visual strings using workspace template formats
       const prompt1 = getCustomImagePrompt(row.title, 1);
       const prompt2 = getCustomImagePrompt(row.title, 2);
 
-      // 3. Dual Creative Asset Generations via Choice Provider Engine
+      // 3. Execution Loops out to Krea AI
       log(`  🎨 Synthesizing primary visual creative targets...`, 'info');
       const imgUrl1 = await dispatchImageGeneration(prompt1, subModel, 1);
-      log(`    ✓ Asset Image 1 route resolved: ${imgUrl1}`, 'success');
+      log(`    ✓ Krea Asset 1 URL route resolved: ${imgUrl1}`, 'success');
 
       log(`  🎨 Synthesizing variant context angle targets...`, 'info');
       const imgUrl2 = await dispatchImageGeneration(prompt2, subModel, 2);
-      log(`    ✓ Asset Image 2 route resolved: ${imgUrl2}`, 'success');
+      log(`    ✓ Krea Asset 2 URL route resolved: ${imgUrl2}`, 'success');
 
-      // 4. Connect to Placid Composite Canvas Engine
+      // 4. Send generated links over to Placid Layout Engines
       try {
         log('  Sending variant images to Placid Studio...', 'info');
         finalPinUrl = await generatePlacidComposite(row.title, imgUrl1, imgUrl2);
         log('  ✓ Placid high-resolution multi-layer pin generated!', 'success');
       } catch (placidErr) {
-        log(`  ❌ Placid layout compilation failed: ${placidErr.message}. Defaulting to Image 1 route.`, 'warn');
+        log(`  ❌ Placid layout compilation failed: ${placidErr.message}. Defaulting to Krea Asset 1 directly.`, 'warn');
         finalPinUrl = imgUrl1;
       }
 
-      // 5. Handle WordPress Publishing Pipeline
+      // 5. WordPress Media Upload & Publication Sequence Loops
       const wpElement = document.getElementById('enable-wp');
       const doWP = wpElement ? wpElement.checked : true;
 
@@ -90,7 +91,7 @@ async function startGeneration() {
         }
       }
 
-      // 6. Append to Local Workboard State
+      // 6. Push finalized properties to Workspace local states
       S.posts.push({
         title: row.title,
         imageUrl: finalPinUrl,
@@ -113,9 +114,7 @@ async function startGeneration() {
   showToast(`Success! Generated ${pubCount} blog entries.`);
 }
 
-function injectLinks(html) {
-  return html;
-}
+function injectLinks(html) { return html; }
 
 function updateUI() {
   document.getElementById('stat-published').textContent = S.posts.length;
