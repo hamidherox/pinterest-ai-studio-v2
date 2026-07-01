@@ -22,18 +22,17 @@ async function generatePlacidComposite(title, imgUrl1, imgUrl2) {
   };
 
   // Safe open server-to-server bridge proxy to handle client-side header security rules
-  const proxyUrl = "https://corsproxy.io/?";
-  const targetUrl = "https://api.placid.app/api/rest/images/";
+ const targetUrl = "https://api.placid.app/api/rest/images/";
 
-  const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
-    method: 'POST',
-    headers: { 
-      'Authorization': exactToken, 
-      'Content-Type': 'application/json', 
-      'Accept': 'application/json' 
-    },
-    body: JSON.stringify(payload)
-  });
+const response = await fetch(targetUrl, {
+  method: 'POST',
+  headers: { 
+    'Authorization': exactToken, 
+    'Content-Type': 'application/json', 
+    'Accept': 'application/json' 
+  },
+  body: JSON.stringify(payload)
+});
 
   if (!response.ok) {
     const errText = await response.text();
