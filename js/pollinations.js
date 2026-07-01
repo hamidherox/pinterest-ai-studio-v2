@@ -27,10 +27,17 @@ async function generateKreaImage(prompt, model, variantIndex) {
     throw new Error("Krea AI token is missing from settings configuration.");
   }
 
-  log(`🎨 Dispatching layout prompt block to Krea Engine [${model}]...`, 'info');
+  // 💡 SANITY MAPPING: Clean 'black-forest-labs/FLUX.1-schnell' -> 'flux-schnell'
+  let cleanModel = "flux-schnell"; 
+  if (model && model.toLowerCase().includes('schnell')) {
+    cleanModel = "flux-schnell";
+  } else if (model && model.toLowerCase().includes('v3')) {
+    cleanModel = "krea-v3";
+  }
+
+  log(`  🎨 Dispatching layout prompt block to Krea Engine [${cleanModel}]...`, 'info');
 
   const proxyUrl = "https://corsproxy.io/?";
-  // 💡 FIXED: Changed from /v1/images to /v1/image
   const targetUrl = "https://api.krea.ai/v1/image";
 
   const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
@@ -41,7 +48,7 @@ async function generateKreaImage(prompt, model, variantIndex) {
       'Accept': 'application/json'
     },
     body: JSON.stringify({
-      model: model,
+      model: cleanModel,
       input: {
         prompt: prompt,
         aspect_ratio: "2:3",
@@ -56,6 +63,8 @@ async function generateKreaImage(prompt, model, variantIndex) {
   }
 
   const result = await response.json();
+  
+  // Pluck asset paths out safely from standard API arrays
   const finalImgUrl = result.data?.[0]?.uri || result.data?.[0]?.url || result.url || result.uri;
   if (!finalImgUrl) throw new Error("Krea generation succeeded but returned empty asset paths.");
   
