@@ -1,27 +1,26 @@
-document.addEventListener("DOMContentLoaded", function() {
-  const imgEngineContainer = document.getElementById('image-engine-settings-container');
+/**
+ * Tab Navigation Panel Switcher
+ */
+function showPanel(panelName, element) {
+  // 1. Deactivate all tab panels
+  const panels = document.querySelectorAll('.panel');
+  panels.forEach(p => p.classList.remove('active'));
 
-  if (imgEngineContainer) {
-    imgEngineContainer.innerHTML = `
-      <div class="setting-group">
-        <label for="img-engine-source">Image AI Provider</label>
-        <select id="img-engine-source">
-          <option value="krea" selected>Krea AI (Exclusive Engine)</option>
-        </select>
-      </div>
-
-      <div class="setting-group" id="krea-model-group">
-        <label for="img-sub-model">Krea Model Profile</label>
-        <select id="img-sub-model">
-          <option value="krea/krea-2/medium" selected>Krea 2: Medium (Flux Balanced)</option>
-          <option value="krea/krea-2/large">Krea 2: Large (High-Detail)</option>
-        </select>
-      </div>
-    `;
+  // 2. Activate target panel
+  const targetPanel = document.getElementById(`panel-${panelName}`);
+  if (targetPanel) {
+    targetPanel.classList.add('active');
   }
-});
 
-// Leave an empty stub function so if any old code calls it, your UI won't crash
-function toggleEngineUI() {
-  return true;
+  // 3. Cycle active CSS highlight classes across navigation buttons
+  const navItems = document.querySelectorAll('.sidebar .nav-item');
+  navItems.forEach(item => item.classList.remove('active'));
+
+  if (element) {
+    element.classList.add('active');
+  }
 }
+
+// Global script safety stubs so legacy functions in other files won't throw exceptions
+function toggleEngineModelDropdown() { return true; }
+function toggleEngineUI() { return true; }
