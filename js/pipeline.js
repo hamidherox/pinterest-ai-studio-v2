@@ -24,22 +24,9 @@ async function startGeneration() {
       const article = await generateArticle(row.title, row.website);
       log(`  ✓ Recipe copy generated dynamically via AI.`, 'success');
 
-      // 2. Generate Dual Visual Prompts
-      const prompt1 = `food photography, ${row.title}::1, tilt shift, branding composition, high detail, steakhouse, professional magazine ad.
-
-To create this ultra-realistic and mouth-watering image, we recommend using a full-frame DSLR camera with a macro lens to capture the intricate details of the dish.
-
-For the best results, set the camera to manual mode and adjust the following settings:
-
-ISO: 100-200 to minimize noise and maintain image quality
-Aperture: f/2.8
-Shutter Speed: 1/160
-White Balance: Daylight
-
-Lighting is key in food photography. Use natural light if possible. If shooting indoors, use a softbox or diffuser.
-
---ar 3:2 --v 4`;
-      const prompt2 = `Gourmet preparation shot of ingredients for ${row.title}, rustic studio lighting, editorial style --ar 2:3`;
+      // 2. Generate Custom Prompts from Workspace Settings Template
+      const prompt1 = getCustomImagePrompt(row.title, 1);
+      const prompt2 = getCustomImagePrompt(row.title, 2);
 
       // 3. Dual Creative Asset Generations via Choice Provider Engine
       log(`  🎨 Synthesizing primary visual creative targets...`, 'info');
