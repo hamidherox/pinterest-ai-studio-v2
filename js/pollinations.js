@@ -30,7 +30,8 @@ async function generateKreaImage(prompt, model, variantIndex) {
   log(`🎨 Dispatching layout prompt block to Krea Engine [${model}]...`, 'info');
 
   const proxyUrl = "https://corsproxy.io/?";
-  const targetUrl = "https://api.krea.ai/v1/images";
+  // 💡 FIXED: Changed from /v1/images to /v1/image
+  const targetUrl = "https://api.krea.ai/v1/image";
 
   const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
     method: 'POST',
