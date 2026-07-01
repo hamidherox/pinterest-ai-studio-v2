@@ -18,16 +18,19 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
     throw new Error("Krea API token is missing from your configuration workspace settings.");
   }
 
-  // Fallback to standard medium model if choice parameter is empty
-  const selectedModel = subModel || 'image/krea/krea-2/medium';
+  // Map the dropdown clean values to Krea's exact string expectations
+  // Krea expects "krea-2/medium" or "krea-2/large" inside the model field
+  let selectedModel = "krea-2/medium";
+  if (subModel && subModel.includes("large")) {
+    selectedModel = "krea-2/large";
+  }
 
-  log(`  🎨 Dispatching prompt to Krea Core Pipeline [Model: ${selectedModel}]...`, 'info');
+  log(`  🎨 Dispatching prompt directly to Krea Core Pipeline [Model: ${selectedModel}]...`, 'info');
 
-  // The universal base URL for Krea operations
-  const proxyUrl = "https://corsproxy.io/?";
-  const targetUrl = "https://api.krea.ai/v1/image";
+  // Direct target endpoint without using corsproxy.io
+  const targetUrl = "https://api.krea.ai/v1/image/generate";
 
-  const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+  const response = await fetch(targetUrl, {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
@@ -35,12 +38,10 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
       'Accept': 'application/json'
     },
     body: JSON.stringify({
-      model: selectedModel, // Pass model parameter directly inside the root JSON payload structure
-      input: {
-        prompt: prompt,
-        aspect_ratio: "2:3", 
-        resolution: "1K"
-      }
+      model: selectedModel,
+      prompt: prompt,
+      aspect_ratio: "2:3",
+      resolution: "1K"
     })
   });
 
@@ -51,8 +52,8 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
 
   const result = await response.json();
   
-  // Safely extract the valid URL string out of Krea's response data fields
-  const finalImgUrl = result.data?.urls?.[0] || result.data?.[0]?.uri || result.data?.[0]?.url || result.url;
+  // Extract URL from Krea response payload
+  const finalImgUrl = result.data?.urls?.[0] || result.data?.[0]?.uri || result.data?.[0]?.url || result.url || result.uri;
   if (!finalImgUrl) {
     throw new Error("Krea API call executed successfully, but no valid image asset URL string was returned.");
   }
