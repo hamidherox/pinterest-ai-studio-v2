@@ -1,3 +1,4 @@
+// Parse your visual layout context string matching workspace templates
 function getCustomImagePrompt(recipeTitle, variantIndex) {
   const template = S.config.promptTpl || 'food photography, [$title]::1, tilt shift, branding composition';
   let prompt = template.replace('[$title]', recipeTitle);
@@ -19,14 +20,14 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
     selectedModel = "krea-2/large";
   }
 
-  log(`  🎨 Dispatching prompt via Direct Data Tunnel [Model: ${selectedModel}]...`, 'info');
+  log(`  🎨 Dispatching prompt directly to Krea Production Servers [Model: ${selectedModel}]...`, 'info');
 
-  // Clean, fast, and unblocked data proxy alternative
+  // Direct production REST endpoint — completely proxy-free
   const targetUrl = "https://api.krea.ai/v1/image/generate";
-  const proxyUrl = "https://corsproxy.io/?" + encodeURIComponent(targetUrl);
 
-  const response = await fetch(proxyUrl, {
+  const response = await fetch(targetUrl, {
     method: 'POST',
+    mode: 'cors', // Explicitly enforce native cross-origin resource sharing handshake
     headers: {
       'Authorization': `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
