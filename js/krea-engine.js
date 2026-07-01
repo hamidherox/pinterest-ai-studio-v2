@@ -10,7 +10,7 @@ function getCustomImagePrompt(recipeTitle, variantIndex) {
 }
 
 /**
- * Global Direct Krea AI Image Synthesizer
+ * Global Direct Krea AI Image Synthesizer (CORS-Compliant via Allorigins Wrapper)
  */
 async function dispatchImageGeneration(prompt, subModel, variantIndex) {
   const apiKey = (S.config.kreaApiKey || '').trim();
@@ -18,17 +18,17 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
     throw new Error("Krea API token is missing from your configuration workspace settings.");
   }
 
-  // Map the dropdown clean values to Krea's exact string expectations
+  // Sanitize sub-model matching string values
   let selectedModel = "krea-2/medium";
   if (subModel && subModel.includes("large")) {
     selectedModel = "krea-2/large";
   }
 
-  log(`  🎨 Dispatching prompt directly to Krea Core Pipeline [Model: ${selectedModel}]...`, 'info');
+  log(`  🎨 Dispatching prompt via Allorigins Gateway [Model: ${selectedModel}]...`, 'info');
 
-  // Programmatic proxy wrapper target to handle browser cross-origin requests
   const baseTargetUrl = "https://api.krea.ai/v1/image/generate";
-  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(baseTargetUrl)}`;
+  // Allorigins programmatic proxy bridge
+  const proxyUrl = "https://api.allorigins.win/get?url=" + encodeURIComponent(baseTargetUrl);
 
   const response = await fetch(proxyUrl, {
     method: 'POST',
@@ -36,7 +36,6 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      // Pass standard request configuration options along inside the wrapper payload block
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
@@ -59,10 +58,10 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
 
   const wrapperData = await response.json();
   
-  // Parse out the nested string content returned by the server wrapper engine
+  // Safely parse out the raw nested string data contents back into a JSON object 
   const result = typeof wrapperData.contents === 'string' ? JSON.parse(wrapperData.contents) : wrapperData.contents;
   
-  // Extract URL from Krea response payload
+  // Extract asset URL from Krea response payload structure
   const finalImgUrl = result.data?.urls?.[0] || result.data?.[0]?.uri || result.data?.[0]?.url || result.url || result.uri;
   if (!finalImgUrl) {
     throw new Error("Krea API call executed successfully, but no valid image asset URL string was returned.");
