@@ -155,43 +155,39 @@
     <div id="panel-settings" class="panel">
       <div class="page-header"><div class="page-title">Configuration Settings</div></div>
 
-      <div class="card">
-        <div class="card-title">🛡️ Central API Key Gateways & Debug Tools</div>
-        <div class="form-grid cols-2">
-          <div class="form-group">
-            <label>OpenAI Premium Key</label>
-            <input type="password" id="cfg-apikey" placeholder="sk-proj-..." oninput="saveConfig()"/>
-          </div>
-          <div class="form-group">
-            <label>Krea AI Studio API Key</label>
-            <input type="password" id="cfg-krea-key" placeholder="kr-xxxxxxxxxxxxxxxx" oninput="saveConfig()"/>
-          </div>
-          <div class="form-group">
-            <label>Hugging Face Token (Optional)</label>
-            <input type="password" id="cfg-hf-token" placeholder="hf_xxxxxxxxxxxxxxxx" oninput="saveConfig()"/>
-          </div>
-          <div class="form-group">
-            <label>Placid Private API Token (placid.app Key)</label>
-            <input type="password" id="cfg-placid-token" placeholder="Bearer placid-..." oninput="saveConfig()"/>
-          </div>
-          <div class="form-group">
-            <label>Placid Template UID</label>
-            <input type="text" id="cfg-placid-uuid" placeholder="e.g., vb9j5mr3d1pie" oninput="saveConfig()"/>
-          </div>
-          <div class="form-group">
-            <label>Target Website Title/Name (Placid Subline Sync)</label>
-            <input type="text" id="cfg-site-name" placeholder="e.g., simplecheapmom.com" oninput="saveConfig()"/>
-          </div>
-          <div class="form-group full">
-            <label>AI Image Generation Prompt Template</label>
-            <textarea id="cfg-prompt-tpl" rows="2" oninput="saveConfig()">food photography, [$title]::1, tilt shift, branding composition, high detail, luxury dinner table, professional magazine ad</textarea>
-          </div>
-          <div class="form-group full" style="display: flex; flex-direction: row; justify-content: flex-end; gap: 10px;">
-            <button class="btn btn-outline" style="height:38px;" onclick="testAIConnection()">🔍 Test AI Connection</button>
-            <button class="btn btn-outline" style="height:38px;" onclick="testPlacidConnection()">🔍 Test Placid Connection</button>
-          </div>
+    <div class="card">
+      <div class="card-title">🛡️ Central API Key Gateways & Debug Tools</div>
+      <div class="form-grid cols-2">
+        <div class="form-group">
+          <label>OpenAI Premium Key</label>
+          <input type="password" id="cfg-apikey" placeholder="sk-proj-..." oninput="saveConfig()"/>
+        </div>
+        <div class="form-group">
+          <label>Krea AI Studio API Key</label>
+          <input type="password" id="cfg-krea-key" placeholder="kr-xxxxxxxxxxxxxxxx" oninput="saveConfig()"/>
+        </div>
+        <div class="form-group">
+          <label>Placid Private API Token (placid.app Key)</label>
+          <input type="password" id="cfg-placid-token" placeholder="Bearer placid-..." oninput="saveConfig()"/>
+        </div>
+        <div class="form-group">
+          <label>Placid Template UID</label>
+          <input type="text" id="cfg-placid-uuid" placeholder="e.g., vb9j5mr3d1pie" oninput="saveConfig()"/>
+        </div>
+        <div class="form-group full">
+          <label>Target Website Title/Name (Placid Subline Sync)</label>
+          <input type="text" id="cfg-site-name" placeholder="e.g., simplecheapmom.com" oninput="saveConfig()" style="max-width: 50%;"/>
+        </div>
+        <div class="form-group full">
+          <label>AI Image Generation Prompt Template</label>
+          <textarea id="cfg-prompt-tpl" rows="2" oninput="saveConfig()">food photography, [$title]::1, tilt shift, branding composition, high detail, luxury dinner table, professional magazine ad</textarea>
+        </div>
+        <div class="form-group full" style="display: flex; flex-direction: row; justify-content: flex-end; gap: 10px;">
+          <button class="btn btn-outline" style="height:38px;" onclick="testAIConnection()">🔍 Test AI Connection</button>
+          <button class="btn btn-outline" style="height:38px;" onclick="testPlacidConnection()">🔍 Test Placid Connection</button>
         </div>
       </div>
+    </div>
 
       <div class="card">
         <div class="card-title">WordPress Target Nodes</div>
