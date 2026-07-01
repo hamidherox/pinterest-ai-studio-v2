@@ -19,7 +19,6 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
   }
 
   // Map the dropdown clean values to Krea's exact string expectations
-  // Krea expects "krea-2/medium" or "krea-2/large" inside the model field
   let selectedModel = "krea-2/medium";
   if (subModel && subModel.includes("large")) {
     selectedModel = "krea-2/large";
@@ -27,21 +26,29 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
 
   log(`  🎨 Dispatching prompt directly to Krea Core Pipeline [Model: ${selectedModel}]...`, 'info');
 
-  // Direct target endpoint without using corsproxy.io
-  const targetUrl = "https://api.krea.ai/v1/image/generate";
+  // Programmatic proxy wrapper target to handle browser cross-origin requests
+  const baseTargetUrl = "https://api.krea.ai/v1/image/generate";
+  const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(baseTargetUrl)}`;
 
-  const response = await fetch(targetUrl, {
+  const response = await fetch(proxyUrl, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      model: selectedModel,
-      prompt: prompt,
-      aspect_ratio: "2:3",
-      resolution: "1K"
+      // Pass standard request configuration options along inside the wrapper payload block
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      method: 'POST',
+      body: JSON.stringify({
+        model: selectedModel,
+        prompt: prompt,
+        aspect_ratio: "2:3",
+        resolution: "1K"
+      })
     })
   });
 
@@ -50,7 +57,10 @@ async function dispatchImageGeneration(prompt, subModel, variantIndex) {
     throw new Error(`Krea Gateway Error (Status ${response.status}): ${errorText.substring(0, 150)}`);
   }
 
-  const result = await response.json();
+  const wrapperData = await response.json();
+  
+  // Parse out the nested string content returned by the server wrapper engine
+  const result = typeof wrapperData.contents === 'string' ? JSON.parse(wrapperData.contents) : wrapperData.contents;
   
   // Extract URL from Krea response payload
   const finalImgUrl = result.data?.urls?.[0] || result.data?.[0]?.uri || result.data?.[0]?.url || result.url || result.uri;
