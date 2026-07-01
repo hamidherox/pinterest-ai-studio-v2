@@ -27,9 +27,9 @@ async function generateKreaImage(prompt, model, variantIndex) {
     throw new Error("Krea AI token is missing from settings configuration.");
   }
 
-  // 💡 SANITY MAPPING: Clean 'black-forest-labs/FLUX.1-schnell' -> 'flux-schnell'
+  // 1. Map selection string to clean engine profiles
   let cleanModel = "flux-schnell"; 
-  if (model && model.toLowerCase().includes('schnell')) {
+  if (model && (model.toLowerCase().includes('schnell') || model.toLowerCase().includes('flux'))) {
     cleanModel = "flux-schnell";
   } else if (model && model.toLowerCase().includes('v3')) {
     cleanModel = "krea-v3";
@@ -37,10 +37,11 @@ async function generateKreaImage(prompt, model, variantIndex) {
 
   log(`  🎨 Dispatching layout prompt block to Krea Engine [${cleanModel}]...`, 'info');
 
-  const proxyUrl = "https://corsproxy.io/?";
-  const targetUrl = "https://api.krea.ai/v1/image";
+  // 2. STRICTLY LOCALIZED PROXY: Declared inside this function only to prevent global leaks
+  const isolatedProxy = "https://corsproxy.io/?";
+  const targetApiUrl = "https://api.krea.ai/v1/images";
 
-  const response = await fetch(proxyUrl + encodeURIComponent(targetUrl), {
+  const response = await fetch(isolatedProxy + encodeURIComponent(targetApiUrl), {
     method: 'POST',
     headers: {
       'Authorization': `Bearer ${apiKey}`,
@@ -49,11 +50,9 @@ async function generateKreaImage(prompt, model, variantIndex) {
     },
     body: JSON.stringify({
       model: cleanModel,
-      input: {
-        prompt: prompt,
-        aspect_ratio: "2:3",
-        resolution: "1K"
-      }
+      prompt: prompt,
+      aspect_ratio: "2:3",
+      resolution: "1K"
     })
   });
 
@@ -64,8 +63,8 @@ async function generateKreaImage(prompt, model, variantIndex) {
 
   const result = await response.json();
   
-  // Pluck asset paths out safely from standard API arrays
-  const finalImgUrl = result.data?.[0]?.uri || result.data?.[0]?.url || result.url || result.uri;
+  // 3. Fallback extraction layer to pull asset links
+  const finalImgUrl = result.data?.[0]?.uri || result.data?.[0]?.url || result.uri || result.url || (result.data?.urls ? result.data.urls[0] : null);
   if (!finalImgUrl) throw new Error("Krea generation succeeded but returned empty asset paths.");
   
   return finalImgUrl;
